@@ -104,23 +104,14 @@
               Currently action is set to "#", so it won't submit anywhere until you set it.
             -->
 
-            <form id="contactForm"
-                  method="POST"
-                  action="https://formspree.io/f/mkoonjzk"
-                  autocomplete="on"
-                  novalidate>
+            <form
+                  method="POST" action="https://formspree.io/f/mkoonjzk">
 
-              <!-- Honeypot (spam trap) -->
-              <div class="hp-field" aria-hidden="true">
-                <label>Company Website</label>
-                <input type="text" name="website" tabindex="-1" autocomplete="off" />
-              </div>
-
-                            <!-- Formspree extras -->
+              
               <input type="hidden" name="_subject" value="New enquiry from ElevateIT website" />
               <input type="hidden" name="_redirect" value="https://www.elevateitco.com/contact.html?success=1" />
-
-              <div class="fields">
+<!-- Honeypot (spam trap) -->
+<div class="fields">
                 <div class="field half">
                   <label for="firstName">First name <span class="req">*</span></label>
                   <input id="firstName" name="firstName" type="text" required minlength="2" />
@@ -200,8 +191,7 @@
               </p>
 
               <!-- Client-side validation message -->
-              <div id="formAlert" class="contact-alert" role="alert" hidden></div>
-            </form>
+</form>
           </section>
         </div>
       </div>
@@ -229,52 +219,14 @@
   <script src="assets/js/breakpoints.min.js"></script>
   <script src="assets/js/util.js"></script>
   <script src="assets/js/main.js"></script>
-
-  <!-- Contact page script -->
   <script>
     (function () {
-      // Show success banner when redirected back with ?success=1
       const params = new URLSearchParams(window.location.search);
       const success = params.get("success");
       const successBanner = document.getElementById("successBanner");
       if (success === "1" && successBanner) successBanner.hidden = false;
-
-      const form = document.getElementById("contactForm");
-      const alertBox = document.getElementById("formAlert");
-
-      function showAlert(msg) {
-        if (!alertBox) return;
-        alertBox.textContent = msg;
-        alertBox.hidden = false;
-      }
-
-      function clearAlert() {
-        if (!alertBox) return;
-        alertBox.hidden = true;
-        alertBox.textContent = "";
-      }
-
-      if (!form) return;
-
-      form.addEventListener("submit", function (e) {
-        clearAlert();
-
-        // Basic HTML validation
-        if (!form.checkValidity()) {
-          e.preventDefault();
-          showAlert("Please complete all required fields correctly.");
-          return;
-        }
-
-        // Honeypot: if filled, block submission
-        const hp = form.querySelector('input[name="website"]');
-        if (hp && hp.value.trim() !== "") {
-          e.preventDefault();
-          showAlert("Submission blocked.");
-          return;
-        }
-});
     })();
   </script>
+
 </body>
 </html>
