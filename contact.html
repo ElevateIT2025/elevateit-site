@@ -105,11 +105,7 @@
             -->
 
             <form
-                  method="POST" action="https://formspree.io/f/mkoonjzk">
-
-              
-              <input type="hidden" name="_subject" value="New enquiry from ElevateIT website" />
-              <input type="hidden" name="_redirect" value="https://www.elevateitco.com/contact.html?success=1" />
+                  method="POST" action="https://docs.google.com/forms/d/e/1FAIpQLSeTpTIPFSmpbdyiUR8GhWTaPaP1bJx0Ud31s6rIhm5eLDrlHw/formResponse" id="contactForm">
 <!-- Honeypot (spam trap) -->
 <div class="fields">
                 <div class="field half">
@@ -168,15 +164,12 @@
                 </div>
 
                 <div class="field">
-                  <label class="check">
-                    <input type="checkbox" name="consent" required />
-                    <span>
-                      I agree to be contacted about this enquiry. <span class="req">*</span>
-                    </span>
-                  </label>
-                </div>
+  <input type="checkbox" id="consent" name="consent" required>
+  <label for="consent">I agree to be contacted about this enquiry. <span class="req">*</span></label>
+</div>
               </div>
 
+              
               
               <ul class="actions">
                 <li><input type="submit" value="Submit" class="primary" /></li>
@@ -222,6 +215,112 @@
       const success = params.get("success");
       const successBanner = document.getElementById("successBanner");
       if (success === "1" && successBanner) successBanner.hidden = false;
+    })();
+  </script>
+
+  <!-- Success / Error Modal -->
+  <div id="statusModal" class="eit-modal" hidden>
+    <div class="eit-modal__backdrop" data-close="1"></div>
+    <div class="eit-modal__panel" role="dialog" aria-modal="true" aria-labelledby="eitModalTitle">
+      <h3 id="eitModalTitle">Message sent</h3>
+      <p id="eitModalMessage">Your request was submitted successfully.</p>
+      <ul class="actions">
+        <li><button type="button" class="primary" id="eitModalClose">Close</button></li>
+      </ul>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const GOOGLE_FORM_ACTION = "https://docs.google.com/forms/d/e/1FAIpQLSeTpTIPFSmpbdyiUR8GhWTaPaP1bJx0Ud31s6rIhm5eLDrlHw/formResponse";
+      const MAP = {
+        firstName: "entry.1176411396",
+        lastName: "entry.897766649",
+        email: "entry.1556255643",
+        phone: "entry.642941796",
+        company: "entry.966945755",
+        enquiry: "entry.226887882",
+        message: "entry.736270417",
+        consent: "entry.181917616"
+      };
+      const CONSENT_TEXT = "I agree";
+
+      const form = document.getElementById("contactForm");
+      const modal = document.getElementById("statusModal");
+      const modalTitle = document.getElementById("eitModalTitle");
+      const modalMsg = document.getElementById("eitModalMessage");
+      const closeBtn = document.getElementById("eitModalClose");
+
+      function openModal(title, message) {
+        if (!modal) return;
+        if (modalTitle) modalTitle.textContent = title;
+        if (modalMsg) modalMsg.textContent = message;
+        modal.hidden = false;
+        document.body.classList.add("eit-modal-open");
+      }
+
+      function closeModal() {
+        if (!modal) return;
+        modal.hidden = true;
+        document.body.classList.remove("eit-modal-open");
+      }
+
+      if (modal) {
+        modal.addEventListener("click", function (e) {
+          if (e.target && e.target.getAttribute("data-close") === "1") closeModal();
+        });
+      }
+      if (closeBtn) closeBtn.addEventListener("click", closeModal);
+
+      if (!form) return;
+
+      form.addEventListener("submit", async function (e) {
+        e.preventDefault();
+
+        if (!form.checkValidity()) {
+          form.reportValidity();
+          return;
+        }
+
+        const submitBtn = form.querySelector('input[type="submit"], button[type="submit"]');
+        const oldText = submitBtn ? (submitBtn.value !== undefined ? submitBtn.value : submitBtn.textContent) : "";
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          if (submitBtn.value !== undefined) submitBtn.value = "Sending...";
+          else submitBtn.textContent = "Sending...";
+        }
+
+        try {
+          const payload = new FormData();
+          payload.append(MAP.firstName, (form.firstName?.value || "").trim());
+          payload.append(MAP.lastName, (form.lastName?.value || "").trim());
+          payload.append(MAP.email, (form.email?.value || "").trim());
+          payload.append(MAP.phone, (form.phone?.value || "").trim());
+          payload.append(MAP.company, (form.company?.value || "").trim());
+          payload.append(MAP.enquiry, (form.enquiry?.value || "").trim());
+          payload.append(MAP.message, (form.message?.value || "").trim());
+
+          const consentChecked = !!form.querySelector("#consent")?.checked;
+          payload.append(MAP.consent, consentChecked ? CONSENT_TEXT : "");
+
+          await fetch(GOOGLE_FORM_ACTION, {
+            method: "POST",
+            mode: "no-cors",
+            body: payload
+          });
+
+          form.reset();
+          openModal("Request submitted", "Request sent to info@elevateitco.com successfully.");
+        } catch (err) {
+          openModal("Submission failed", "Network error. Please try again.");
+        } finally {
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            if (submitBtn.value !== undefined) submitBtn.value = oldText || "Submit";
+            else submitBtn.textContent = oldText || "Submit";
+          }
+        }
+      });
     })();
   </script>
 
